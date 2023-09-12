@@ -30,7 +30,7 @@ var canvasContext = canvasElement.getContext("2d", {
 canvasElement.width = cols;
 canvasElement.height = rows;
 
-setInterval(capture, 100);
+setInterval(capture, 30);
 
 initWebCam();
 
@@ -186,4 +186,4 @@ for (var i = 0; i < window.innerWidth / 2; i++) {
   };
 }
 
-setInterval(drawMatrixRain, 100);
+setInterval(drawMatrixRain, 30);
