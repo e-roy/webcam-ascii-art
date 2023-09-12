@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Webcam ASCII Art</title>
+    <style>
+      body {
+        background-color: black;
+      }
+      html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+      }
+      #canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <video id="videoElement" autoplay hidden></video>
+    <canvas id="canvas"></canvas>
+    <script src="canvas.js"></script>
+  </body>
+</html>
