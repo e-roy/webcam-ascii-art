@@ -68,11 +68,36 @@ function capture() {
   }
 }
 
+var pulseTime = 0;
+
 function drawPixelBlocks() {
   var pbYCount = 0,
     pbXcount = 0;
   var blockColourStroke = "rgba(0,0,0,1)";
-  var blockColourFill = "rgba(61, 249, 104, 0.4)";
+
+  // Define two close RGB colors for the pulse effect
+  var colorStart = { r: 61, g: 249, b: 104 };
+  var colorEnd = { r: 51, g: 239, b: 94 }; // Slightly different RGB values
+  var pulseSpeed = 0.05; // Adjust the speed of the pulse here
+
+  // Calculate the interpolation factor using a sine wave
+  var interpolationFactor = (Math.sin(pulseTime) + 1) / 2; // Oscillates between 0 and 1
+  pulseTime += pulseSpeed;
+
+  // Interpolate between the two colors
+  var r = Math.round(
+    colorStart.r + (colorEnd.r - colorStart.r) * interpolationFactor
+  );
+  var g = Math.round(
+    colorStart.g + (colorEnd.g - colorStart.g) * interpolationFactor
+  );
+  var b = Math.round(
+    colorStart.b + (colorEnd.b - colorStart.b) * interpolationFactor
+  );
+
+  var blockColourFill = `rgba(${r}, ${g}, ${b}, 1)`; // Keep alpha at 1 for full opacity
+
+  // var blockColourFill = "rgba(61, 249, 104, 0.4)";
   var currentX = 0,
     currentY = 0;
   var perBlockXCnt = 0,
@@ -122,7 +147,7 @@ function drawPixelBlocks() {
           textArray.length) %
         textArray.length;
       canvasContext.fillStyle = blockColourFill;
-      canvasContext.font = "10px Arial";
+      canvasContext.font = "12px Arial";
       canvasContext.textAlign = "center";
       canvasContext.fillText(
         textArray[Math.round(textIndex) % textArray.length],
@@ -187,3 +212,63 @@ for (var i = 0; i < window.innerWidth / 2; i++) {
 }
 
 setInterval(drawMatrixRain, 30);
+
+// Record video
+const videoElement = document.querySelector("#videoElement");
+const startBtn = document.querySelector("#startBtn");
+const stopBtn = document.querySelector("#stopBtn");
+
+let mediaRecorder;
+let chunks = [];
+
+// Function to start recording the canvas
+const startRecording = () => {
+  // Capture the stream from the canvas
+  const stream = canvasElement.captureStream(30); // 30 FPS - adjust as needed
+  const mimeType = "video/webm";
+
+  // Check if the mimeType is supported
+  if (!MediaRecorder.isTypeSupported(mimeType)) {
+    console.error(`${mimeType} is not supported!`);
+    return;
+  }
+
+  mediaRecorder = new MediaRecorder(stream, { mimeType });
+
+  mediaRecorder.ondataavailable = (event) => {
+    if (event.data.size > 0) {
+      chunks.push(event.data);
+    }
+  };
+
+  mediaRecorder.onstop = saveVideo;
+
+  mediaRecorder.start();
+  startBtn.disabled = true;
+  stopBtn.disabled = false;
+};
+
+// Function to stop recording the canvas
+const stopRecording = () => {
+  mediaRecorder.stop();
+  startBtn.disabled = false;
+  stopBtn.disabled = true;
+};
+
+// Function to save the video file
+const saveVideo = () => {
+  const blob = new Blob(chunks, { type: "video/webm" });
+  chunks = [];
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  document.body.appendChild(a);
+  a.style.display = "none";
+  a.href = url;
+  a.download = "recording.webm";
+  a.click();
+  window.URL.revokeObjectURL(url);
+};
+
+startBtn.addEventListener("click", startRecording);
+stopBtn.addEventListener("click", stopRecording);

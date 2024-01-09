@@ -5,6 +5,11 @@
     <style>
       body {
         background-color: black;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
       }
       html {
         margin: 0;
@@ -18,11 +23,19 @@
         top: 0;
         left: 0;
       }
+      #controls {
+        position: absolute;
+        z-index: 10;
+      }
     </style>
   </head>
   <body>
     <video id="videoElement" autoplay hidden></video>
     <canvas id="canvas"></canvas>
+    <div id="controls">
+      <button id="startBtn">Start Recording</button>
+      <button id="stopBtn" disabled>Stop Recording</button>
+    </div>
     <script src="canvas.js"></script>
   </body>
 </html>
